@@ -32,3 +32,46 @@ password: `guest`
 `npm install`
 
 `npm install amqplib` [amqplib Node library](https://www.npmjs.com/package/amqplib)
+
+```js
+cd rabbitmq/rabbitmq-producer
+npx express-generator
+npm install
+npm install amqplib
+```
+
+Create a new file called message.js next to index.js.
+
+```js
+var express = require('express');
+var router = express.Router();
+
+var amqp = require('amqplib/callback_api');
+
+const url = 'amqp://localhost';
+const queue = 'my-queue';
+
+let channel = null;
+
+amqp.connect(url, function (err, conn) {
+  if (!conn) {
+    throw new Error(`AMQP connection not available on ${url}`);
+  }
+  conn.createChannel(function (err, ch) {
+    channel = ch;
+  });
+});
+
+process.on('exit', code => {
+  channel.close();
+  console.log(`Closing`);
+});
+
+router.post('/', function (req, res, next) {
+  channel.sendToQueue(queue, new Buffer.from(req.body.message));
+  res.render('index', { response: `Successfully sent: ${req.body.message}` });
+});
+
+module.exports = router;
+```
+`docker run --rm -it -p 15672:15672 -p 5672:5672 rabbitmq:3-management`
