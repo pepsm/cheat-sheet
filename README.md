@@ -9,5 +9,6 @@
 
 ### RabbitMQ
 
-`docker network create rabbits` run local docker network called rabbit-1 every instance will run in the same network
+`docker network create rabbits` run local docker network called rabbit-1 every instance will run in the same network.
+
 `docker run -d --rm --net rabbits --hostname rabbit-1 --name rabbit-1 rabbitmq:3.8`
